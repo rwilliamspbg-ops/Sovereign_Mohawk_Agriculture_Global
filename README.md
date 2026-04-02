@@ -79,6 +79,20 @@ Then open:
 
 - http://localhost:8080/
 
+### Sprint-1 Full Local Stack (Dashboard + Mock API)
+
+```bash
+docker compose -f docker-compose.mock.yml up
+```
+
+Dashboard:
+
+- http://localhost:8080/
+
+Mock API:
+
+- http://localhost:8088/healthz
+
 ## Suggested Next Integration Steps
 
 1. Copy policy and streaming aggregation adapters from Map and Oncology wrappers.
@@ -116,6 +130,35 @@ Example:
 ```
 
 See `docs/PHASE2_INTEGRATION.md` for payload contract examples.
+
+## Sprint-1 Implementation Status
+
+Completed in this sprint:
+
+- Mock live API (`mock_api/server.py`) with endpoint fixtures.
+- Contract validation script (`scripts/validate_dashboard_contract.py`).
+- Contract test (`tests/test_contract_validator.py`).
+- CI workflow (`.github/workflows/ci.yml`) with contract and endpoint smoke checks.
+- Security workflows (`.github/workflows/codeql.yml`, `.github/workflows/secret-scan.yml`).
+- Dependency update automation (`.github/dependabot.yml`).
+- PR governance files (`.github/pull_request_template.md`, `.github/CODEOWNERS`).
+- Threat baseline (`docs/THREAT_MODEL_BASELINE.md`).
+
+Run local validation:
+
+```bash
+python3 scripts/validate_dashboard_contract.py
+python3 -m unittest -q tests/test_contract_validator.py
+```
+
+## Release Hardening Checklist
+
+Before cutting the first release tag:
+
+1. Ensure Pages deploy from `main` is green.
+2. Ensure CI, CodeQL, and Secret Scan are green.
+3. Ensure contract validator passes with production-shaped payloads.
+4. Ensure branch protection required checks match active workflows.
 
 ## Status
 

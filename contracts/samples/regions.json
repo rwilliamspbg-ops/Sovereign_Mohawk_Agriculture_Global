@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Europe",
+    "crops": "Wheat, barley",
+    "climateRisk": "Heatwave recurrence: moderate-high",
+    "modelConvergence": "96.4%",
+    "soilSignal": "Carbon sequestration trend improving"
+  },
+  {
+    "name": "Africa",
+    "crops": "Maize, sorghum, cassava",
+    "climateRisk": "Rainfall unpredictability: high",
+    "modelConvergence": "92.9%",
+    "soilSignal": "Localized nutrient depletion alerts"
+  }
+]
