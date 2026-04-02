@@ -19,4 +19,4 @@
 ## Governance and Quality
 
 - Main branch is PR-only with required checks and CODEOWNERS review.
-- Required checks: contract-and-smoke, CodeQL (python/javascript), gitleaks.
+- Required checks: CI / contract-and-smoke; CodeQL / Analyze Python and JavaScript (python); CodeQL / Analyze Python and JavaScript (javascript); Secret Scan / gitleaks.
