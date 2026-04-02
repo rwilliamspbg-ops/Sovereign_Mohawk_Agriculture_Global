@@ -4,7 +4,7 @@ Shared execution plan for Agriculture, Climate, and Supply Chain sibling reposit
 
 ## Milestone 1: Live Gateway Adapters
 
-- Implement production API adapter for `/api/*/stats`, `/regions`, `/pipeline`, `/risk`, `/health`.
+- Implement production API adapter for `/api/agri/stats`, `/api/agri/regions`, `/api/agri/pipeline`, `/api/agri/risk`, `/api/agri/health`.
 - Route from Mohawk runtime + exporter stack into dashboard contract schema.
 - Add failure-mode fallback and endpoint-level health telemetry.
 
