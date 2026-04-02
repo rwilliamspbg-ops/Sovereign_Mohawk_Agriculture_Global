@@ -86,6 +86,37 @@ Then open:
 3. Connect compliance controls to production policy definitions.
 4. Add CI quality gates (lint/test/security/performance) mirroring ecosystem standards.
 
+## Phase 2 Integration (Live Endpoint Wiring)
+
+The dashboard now supports live endpoint integration with simulation fallback.
+
+Default endpoint targets:
+
+- `/api/agri/stats`
+- `/api/agri/regions`
+- `/api/agri/pipeline`
+- `/api/agri/risk`
+- `/api/agri/health`
+
+You can override endpoints by setting `window.AGRI_DASHBOARD_CONFIG` before loading `app.js`.
+
+Example:
+
+```html
+<script>
+	window.AGRI_DASHBOARD_CONFIG = {
+		statsUrl: "https://your-gateway.example.com/agri/stats",
+		regionsUrl: "https://your-gateway.example.com/agri/regions",
+		pipelineUrl: "https://your-gateway.example.com/agri/pipeline",
+		riskUrl: "https://your-gateway.example.com/agri/risk",
+		healthUrl: "https://your-gateway.example.com/agri/health",
+		timeoutMs: 5000
+	};
+</script>
+```
+
+See `docs/PHASE2_INTEGRATION.md` for payload contract examples.
+
 ## Status
 
 Bootstrap scaffold complete. Domain adapters and production connectors are planned in the beta hardening cycle documented in `docs/ROADMAP.md`.

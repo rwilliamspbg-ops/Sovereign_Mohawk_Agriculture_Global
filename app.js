@@ -1,11 +1,11 @@
-const stats = {
+const simulatedStats = {
   nodesOnline: 18472,
   flRound: 312,
   complianceScore: 97,
   tokenRate: 842,
 };
 
-const regions = [
+const simulatedRegions = [
   {
     name: "North America",
     crops: "Corn, soy, wheat",
@@ -50,7 +50,7 @@ const regions = [
   },
 ];
 
-const pipelineFeed = [
+const simulatedPipelineFeed = [
   "Round 312: 18,472 nodes submitted signed updates.",
   "Byzantine filters flagged 0.43% suspicious gradients.",
   "Secure aggregation completed with regional quorum attestation.",
@@ -58,7 +58,7 @@ const pipelineFeed = [
   "PQC transport mode enforced on all cross-region channels.",
 ];
 
-const riskFeed = [
+const simulatedRiskFeed = [
   "Pest pressure model detected early rust signals in 14 regions.",
   "Soil model forecasts phosphorus depletion in 8 cooperative zones.",
   "Climate-risk layer marked 5 regions for heat stress mitigation.",
@@ -73,19 +73,25 @@ function setText(id, text) {
   }
 }
 
-function renderStats() {
-  setText("nodesOnline", stats.nodesOnline.toLocaleString());
-  setText("flRound", String(stats.flRound));
-  setText("complianceScore", `${stats.complianceScore}%`);
-  setText("tokenRate", `${stats.tokenRate} MHC/min`);
+function setDataMode(modeLabel) {
+  setText("dataMode", `Data Mode: ${modeLabel}`);
 }
 
-function renderRegions() {
+function renderStats(stats) {
+  setText("nodesOnline", Number(stats.nodesOnline || 0).toLocaleString());
+  setText("flRound", String(stats.flRound || 0));
+  setText("complianceScore", `${stats.complianceScore || 0}%`);
+  setText("tokenRate", `${stats.tokenRate || 0} MHC/min`);
+}
+
+function renderRegions(regions) {
   const container = document.getElementById("regionGrid");
   const details = document.getElementById("regionDetails");
   if (!container || !details) {
     return;
   }
+
+  container.innerHTML = "";
 
   regions.forEach((region) => {
     const button = document.createElement("button");
@@ -110,6 +116,9 @@ function renderFeed(listId, items) {
   if (!list) {
     return;
   }
+
+  list.innerHTML = "";
+
   items.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = item;
@@ -117,7 +126,121 @@ function renderFeed(listId, items) {
   });
 }
 
-renderStats();
-renderRegions();
-renderFeed("pipelineFeed", pipelineFeed);
-renderFeed("riskFeed", riskFeed);
+function renderEndpointStatus(statusItems) {
+  renderFeed("endpointStatus", statusItems);
+}
+
+function getConfig() {
+  const override = window.AGRI_DASHBOARD_CONFIG || {};
+  return {
+    timeoutMs: Number(override.timeoutMs || 3000),
+    statsUrl: override.statsUrl || "/api/agri/stats",
+    regionsUrl: override.regionsUrl || "/api/agri/regions",
+    pipelineUrl: override.pipelineUrl || "/api/agri/pipeline",
+    riskUrl: override.riskUrl || "/api/agri/risk",
+    healthUrl: override.healthUrl || "/api/agri/health",
+  };
+}
+
+async function fetchJson(url, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function loadLiveData(config) {
+  const endpoints = [
+    { key: "stats", url: config.statsUrl },
+    { key: "regions", url: config.regionsUrl },
+    { key: "pipeline", url: config.pipelineUrl },
+    { key: "risk", url: config.riskUrl },
+    { key: "health", url: config.healthUrl },
+  ];
+
+  const results = await Promise.allSettled(
+    endpoints.map((endpoint) => fetchJson(endpoint.url, config.timeoutMs))
+  );
+
+  const data = {
+    stats: { ...simulatedStats },
+    regions: [...simulatedRegions],
+    pipeline: [...simulatedPipelineFeed],
+    risk: [...simulatedRiskFeed],
+  };
+  const endpointStatus = [];
+  let liveSuccessCount = 0;
+
+  results.forEach((result, index) => {
+    const endpoint = endpoints[index];
+    if (result.status === "fulfilled") {
+      liveSuccessCount += 1;
+      endpointStatus.push(`${endpoint.key}: live (${endpoint.url})`);
+
+      if (endpoint.key === "stats") {
+        const payload = result.value || {};
+        data.stats = {
+          nodesOnline: payload.nodesOnline || payload.nodes_online || data.stats.nodesOnline,
+          flRound: payload.flRound || payload.fl_round || data.stats.flRound,
+          complianceScore:
+            payload.complianceScore || payload.compliance_score || data.stats.complianceScore,
+          tokenRate: payload.tokenRate || payload.token_rate || data.stats.tokenRate,
+        };
+      }
+
+      if (endpoint.key === "regions" && Array.isArray(result.value)) {
+        data.regions = result.value;
+      }
+
+      if (endpoint.key === "pipeline") {
+        if (Array.isArray(result.value)) {
+          data.pipeline = result.value;
+        } else if (Array.isArray(result.value.events)) {
+          data.pipeline = result.value.events;
+        }
+      }
+
+      if (endpoint.key === "risk") {
+        if (Array.isArray(result.value)) {
+          data.risk = result.value;
+        } else if (Array.isArray(result.value.events)) {
+          data.risk = result.value.events;
+        }
+      }
+
+      if (endpoint.key === "health" && Array.isArray(result.value.services)) {
+        result.value.services.forEach((service) => {
+          endpointStatus.push(`service ${service.name}: ${service.status}`);
+        });
+      }
+      return;
+    }
+
+    endpointStatus.push(
+      `${endpoint.key}: simulated fallback (${endpoint.url}) - ${result.reason?.message || "unavailable"}`
+    );
+  });
+
+  const mode = liveSuccessCount > 0 ? "Hybrid (Live + Simulation)" : "Simulation";
+  return { data, endpointStatus, mode };
+}
+
+async function initDashboard() {
+  const config = getConfig();
+  const { data, endpointStatus, mode } = await loadLiveData(config);
+  setDataMode(mode);
+  renderStats(data.stats);
+  renderRegions(data.regions);
+  renderFeed("pipelineFeed", data.pipeline);
+  renderFeed("riskFeed", data.risk);
+  renderEndpointStatus(endpointStatus);
+}
+
+initDashboard();
