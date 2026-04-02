@@ -8,6 +8,25 @@ Sovereign Mohawk Agriculture Global enables policy-gated federated learning acro
 
 Sovereign Mohawk Agriculture Global: every farm keeps full data sovereignty while contributing to planetary-scale AI for sustainable yields, climate resilience, pest and disease detection, soil health, and precision resource management.
 
+## Ecosystem
+
+Core repositories:
+
+- [Sovereign-Mohawk-Proto](https://github.com/rwilliamspbg-ops/Sovereign-Mohawk-Proto)
+- [Sovereign_Map_Federated_Learning](https://github.com/rwilliamspbg-ops/Sovereign_Map_Federated_Learning)
+- [Sovereign_Mohawk_Oncology_Global](https://github.com/rwilliamspbg-ops/Sovereign_Mohawk_Oncology_Global)
+- [Sovereign_Mohawk_Agriculture_Global](https://github.com/rwilliamspbg-ops/Sovereign_Mohawk_Agriculture_Global)
+- [Sovereign_Mohawk_Climate_Global](https://github.com/rwilliamspbg-ops/Sovereign_Mohawk_Climate_Global)
+- [Sovereign_Mohawk_SupplyChain_Global](https://github.com/rwilliamspbg-ops/Sovereign_Mohawk_SupplyChain_Global)
+
+Canonical architecture and shared execution plans:
+
+- [docs/ECOSYSTEM_ARCHITECTURE.md](docs/ECOSYSTEM_ARCHITECTURE.md)
+- [docs/UNIFIED_PHASE2_MILESTONES.md](docs/UNIFIED_PHASE2_MILESTONES.md)
+- [docs/GOVERNANCE_PR_ONLY.md](docs/GOVERNANCE_PR_ONLY.md)
+- [docs/ACTION_PINNING_POLICY.md](docs/ACTION_PINNING_POLICY.md)
+- [docs/PRODUCTION_DATA_PLANE_PLAN.md](docs/PRODUCTION_DATA_PLANE_PLAN.md)
+
 ## Core Purpose
 
 - Federated learning across millions of edge nodes (tractors, drones, IoT sensors, weather stations, and satellite-derived field data) without centralizing sensitive farm data.
